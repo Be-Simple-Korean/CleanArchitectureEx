@@ -1,15 +1,16 @@
 package com.example.cleanarchitectureex.data.model.dto
 
+
 data class ListResponse(
     val success: Boolean,
     val code: Int,
     val message: String,
-    val data: List<ContentDTO>
+    val data: List<ContentDto>,
 )
 
 data class ContentResponse(
     val success: Boolean,
     val code: Int,
     val message: String,
-    val data: ContentDTO?
+    val data: ContentDto?,
 )

@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureex.di
 
+import com.example.cleanarchitectureex.util.DateUtil
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -19,13 +20,17 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun providesGsonConverterFactory(): GsonConverterFactory {
-        return GsonConverterFactory.create()
+    fun provideConverterFactory(): GsonConverterFactory {
+        return GsonConverterFactory.create(
+            GsonBuilder()
+                .setDateFormat(DateUtil.serverDateFormat.toPattern())
+                .create()
+        )
     }
 
     @Provides
     @Singleton
-    fun providesOkHttpClient(): OkHttpClient.Builder {
+    fun provideOkHttpClient(): OkHttpClient.Builder {
         return OkHttpClient.Builder().apply {
             connectTimeout(5, TimeUnit.SECONDS)
             readTimeout(5, TimeUnit.SECONDS)
@@ -38,13 +43,14 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun providesRetrofit(
-        client: OkHttpClient,
-        gsonConverterFactory: GsonConverterFactory
+    fun provideRetrofit(
+        client: OkHttpClient.Builder,
+        gsonConverterFactory: GsonConverterFactory,
     ): Retrofit {
-        return Retrofit.Builder().baseUrl("https://api.github.com")
+        return Retrofit.Builder()
+            .baseUrl("http://192.168.31.16:3030/api/v1/fastcampus/chapter8/")
             .addConverterFactory(gsonConverterFactory)
-            .client(client)
+            .client(client.build())
             .build()
     }
 }

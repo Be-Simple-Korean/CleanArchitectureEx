@@ -60,7 +60,14 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$room_version")
-}// Allow references to generated code
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+}
+// Allow references to generated code
 kapt {
     correctErrorTypes = true
 }

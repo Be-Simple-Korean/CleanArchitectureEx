@@ -7,3 +7,4 @@
 - Hilt
 - MVVM
 - Paging
+- ListAdapter(DiffUtil)

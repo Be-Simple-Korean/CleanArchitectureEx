@@ -8,13 +8,14 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.example.cleanarchitectureex.R
 import com.example.cleanarchitectureex.databinding.ActivityMainBinding
+import com.example.cleanarchitectureex.presenter.adapter.MainAdapter
 import com.example.cleanarchitectureex.presenter.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    //    private val adapter by lazy { MainAdapter() }
+    private val mainAdapter by lazy { MainAdapter() }
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,9 +23,9 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView<ActivityMainBinding>(
             this,
             R.layout.activity_main
-        )
-            .apply {
+        ).apply {
                 view = this@MainActivity
+                rv.adapter = mainAdapter
             }
         viewModel.requestRepositories()
 
@@ -33,11 +34,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObserve() {
         viewModel.isLoading.observe(this) { isLoading ->
-           if(isLoading){
-               showProgressBar()
-           }else{
-               hideProgressBar()
-           }
+            if (isLoading) {
+                showProgressBar()
+            } else {
+                hideProgressBar()
+            }
+        }
+        viewModel.itemList.observe(this) {
+            mainAdapter.submitList(it)
+        }
+        viewModel.errorMessage.observe(this) {
+            showErrorDialog(it)
         }
     }
 
@@ -49,8 +56,10 @@ class MainActivity : AppCompatActivity() {
         binding.pb.isVisible = false
     }
 
-    private fun showErrorDialog() {
-        var dialog = AlertDialog.Builder(this).setTitle("네트워크 에러")
+    private fun showErrorDialog(msg: String) {
+        var dialog = AlertDialog.Builder(this)
+            .setTitle("에러 발생")
+            .setMessage(msg)
         dialog.show()
     }
 }

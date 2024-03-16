@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureex.presenter.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,10 +14,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(private val githubUseCase: GithubUseCase) : ViewModel() {
-    val data = MutableLiveData<List<Item>>()
+    private var list = mutableListOf<Item>()
+
+    private val _itemList = MutableLiveData<List<Item>>()
+    val itemList: LiveData<List<Item>> = _itemList
     val isLoading = MutableLiveData<Boolean>()
     val errorMessage = MutableLiveData<String>()
-
+    init {
+        _itemList.value = list
+    }
     fun requestRepositories() {
         viewModelScope.launch {
             isLoading.value = true
@@ -25,7 +31,8 @@ class MainViewModel @Inject constructor(private val githubUseCase: GithubUseCase
                 is ViewState.Success -> {
                     delay(3000)
                     isLoading.value = false
-                    data.value = result.data
+                    list = result.data.toMutableList()
+                    _itemList.value = list
                 }
 
                 is ViewState.Loading -> {

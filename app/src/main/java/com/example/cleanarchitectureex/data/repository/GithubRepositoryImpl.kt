@@ -1,18 +1,20 @@
 package com.example.cleanarchitectureex.data.repository
 
-import com.example.cleanarchitectureex.data.datasource.remote.RepositoryService
-import com.example.cleanarchitectureex.data.model.ItemDTO
+import com.example.cleanarchitectureex.data.datasource.remote.ApiResult
+import com.example.cleanarchitectureex.data.datasource.remote.RemoteDataSource
 import com.example.cleanarchitectureex.data.model.ItemMapper.toItem
 import com.example.cleanarchitectureex.domain.model.Item
 import com.example.cleanarchitectureex.domain.repository.GithubRepository
 import javax.inject.Inject
 
 
-class GithubRepositoryImpl @Inject constructor(private val repositoryService: RepositoryService) :
+class GithubRepositoryImpl @Inject constructor(private val remoteDataSource: RemoteDataSource) :
     GithubRepository {
-    override suspend fun getRepositories(q :String): List<Item> {
-        return repositoryService.getRepositories(q).items.map {
-            it.toItem()
-        };
+    override suspend fun getRepositories(q: String): List<Item>? {
+        return when (val result = remoteDataSource.getRepositories(q)) {
+            is ApiResult.Success -> result.data.map { it.toItem() }
+            is ApiResult.Failure -> null // 실패 처리
+            is ApiResult.Loading -> null // 로딩 상태 처리
+        }
     }
 }

@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         ).apply {
             view = this@MainActivity
         }
-        viewModel
+        viewModel.requestRepositories()
 
     }
 }

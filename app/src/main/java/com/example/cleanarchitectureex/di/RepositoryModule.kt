@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureex.di
 
+import com.example.cleanarchitectureex.data.datasource.remote.RemoteDataSource
 import com.example.cleanarchitectureex.data.datasource.remote.RepositoryService
 import com.example.cleanarchitectureex.data.repository.GithubRepositoryImpl
 import com.example.cleanarchitectureex.domain.repository.GithubRepository
@@ -15,6 +16,6 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providesGithubRepositories(repositoryService: RepositoryService): GithubRepository =
-        GithubRepositoryImpl(repositoryService)
+    fun providesGithubRepositories(remoteDataSource: RemoteDataSource): GithubRepository =
+        GithubRepositoryImpl(remoteDataSource)
 }

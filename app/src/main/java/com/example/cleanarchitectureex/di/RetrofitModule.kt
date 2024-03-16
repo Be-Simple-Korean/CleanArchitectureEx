@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureex.di
 
+import com.example.cleanarchitectureex.data.datasource.remote.RepositoryService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +31,9 @@ object RetrofitModule {
             .addConverterFactory(gsonConverterFactory)
             .build();
     }
+
+    @Provides
+    @Singleton
+    fun providesService(retrofit: Retrofit): RepositoryService =
+        retrofit.create(RepositoryService::class.java)
 }

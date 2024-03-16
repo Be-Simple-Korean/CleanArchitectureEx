@@ -14,7 +14,6 @@ class GithubRepositoryImpl @Inject constructor(private val remoteDataSource: Rem
         return when (val result = remoteDataSource.getRepositories(q)) {
             is ApiResult.Success -> result.data.map { it.toItem() }
             is ApiResult.Failure -> null // 실패 처리
-            is ApiResult.Loading -> null // 로딩 상태 처리
         }
     }
 }

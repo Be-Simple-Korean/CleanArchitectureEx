@@ -2,8 +2,7 @@ package com.example.cleanarchitectureex.data.datasource.remote
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.cleanarchitectureex.data.model.ItemMapper.toItem
-import com.example.cleanarchitectureex.domain.model.Item
+import com.example.cleanarchitectureex.data.model.ItemDTO
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import retrofit2.Response
@@ -14,8 +13,8 @@ class RepositoryPagingSource @Inject constructor(
     private val repositoryService: RepositoryService,
     private val query: String
 ) :
-    PagingSource<Int, Item>() {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Item> {
+    PagingSource<Int, ItemDTO>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ItemDTO> {
         val position = params.key ?: 1
 
         return try {
@@ -28,7 +27,7 @@ class RepositoryPagingSource @Inject constructor(
             when (result) {
                 is ApiResult.Success -> {
                     LoadResult.Page(
-                        data = result.data.items.map { it.toItem() },
+                        data = result.data.items,
                         prevKey = null,
                         nextKey = position + (params.loadSize / 30)
                     )
@@ -45,7 +44,7 @@ class RepositoryPagingSource @Inject constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Item>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ItemDTO>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)

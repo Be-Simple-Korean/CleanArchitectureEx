@@ -1,7 +1,7 @@
-package com.example.cleanarchitectureex.data.model
+package com.example.cleanarchitectureex.data.repository
 
+import com.example.cleanarchitectureex.data.model.ItemDTO
 import com.example.cleanarchitectureex.domain.model.Item
-import java.util.*
 
 object ItemMapper {
 

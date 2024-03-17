@@ -1,14 +1,15 @@
-package com.example.cleanarchitectureex.presenter.adapter
+package com.example.cleanarchitectureex.presenter.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.cleanarchitectureex.databinding.ItemBinding
 import com.example.cleanarchitectureex.domain.model.Item
 
-class MainAdapter : ListAdapter<Item, MainAdapter.MainViewHolder>(DIFF_UTIL) {
+class MainAdapter : PagingDataAdapter<Item, MainAdapter.MainViewHolder>(DIFF_UTIL) {
     companion object {
         val DIFF_UTIL = object : DiffUtil.ItemCallback<Item>() {
             override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {

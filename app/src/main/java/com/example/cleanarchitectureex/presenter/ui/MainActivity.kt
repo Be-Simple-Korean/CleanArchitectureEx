@@ -1,16 +1,19 @@
 package com.example.cleanarchitectureex.presenter.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import com.example.cleanarchitectureex.R
 import com.example.cleanarchitectureex.databinding.ActivityMainBinding
-import com.example.cleanarchitectureex.presenter.adapter.MainAdapter
+import com.example.cleanarchitectureex.presenter.ui.adapter.FooterLoadStateAdapter
+import com.example.cleanarchitectureex.presenter.ui.adapter.MainAdapter
 import com.example.cleanarchitectureex.presenter.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -26,46 +29,30 @@ class MainActivity : AppCompatActivity() {
         )
             .apply {
                 view = this@MainActivity
-                rv.adapter = mainAdapter
+                rv.adapter = mainAdapter.withLoadStateFooter(footer = FooterLoadStateAdapter())
             }
-        viewModel.requestRepositories()
 
         initObserve()
+        initListener()
+        viewModel.getRepositories("mvvm")
+    }
+
+    private fun initListener() {
+        mainAdapter.addLoadStateListener { loadState ->
+            val errorState = loadState.refresh as? LoadState.Error
+                ?: loadState.append as? LoadState.Error
+            errorState?.let {
+                showErrorDialog(it.error.message ?: "Unknown Error")
+            }
+        }
     }
 
     private fun initObserve() {
-        viewModel.viewState.observe(this) { viewState ->
-            when (viewState) {
-                is ViewState.Loading -> {
-                    showProgressBar()
-                    // 로딩 상태 UI 업데이트
-                }
-
-                is ViewState.Success -> {
-                    // 성공 상태 UI 업데이트
-                    hideProgressBar()
-                    mainAdapter.submitList(viewState.data)
-                }
-
-                is ViewState.Error -> {
-                    // 에러 상태 UI 업데이트
-                    hideProgressBar()
-                    showErrorDialog(viewState.message)
-//                    showError(viewState.message)
-                }
+        lifecycleScope.launch {
+            viewModel.repositories.collect {
+                mainAdapter.submitData(it)
             }
         }
-        viewModel.itemList.observe(this) {
-            mainAdapter.submitList(it)
-        }
-    }
-
-    private fun showProgressBar() {
-        binding.pb.isVisible = true
-    }
-
-    private fun hideProgressBar() {
-        binding.pb.isVisible = false
     }
 
     private fun showErrorDialog(msg: String) {

@@ -55,7 +55,6 @@ class RepositoryPagingSource @Inject constructor(
     private fun <T> processResponse(response: Response<T>): ApiResult<T> {
         return if (response.isSuccessful) {
             var body = response.body()
-            body = null
             if (body != null) {
                 ApiResult.Success(body)
             } else {

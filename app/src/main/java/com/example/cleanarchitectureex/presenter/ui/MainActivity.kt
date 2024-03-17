@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView<ActivityMainBinding>(
             this,
             R.layout.activity_main
-        ).apply {
+        )
+            .apply {
                 view = this@MainActivity
                 rv.adapter = mainAdapter
             }
@@ -33,18 +34,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObserve() {
-        viewModel.isLoading.observe(this) { isLoading ->
-            if (isLoading) {
-                showProgressBar()
-            } else {
-                hideProgressBar()
+        viewModel.viewState.observe(this) { viewState ->
+            when (viewState) {
+                is ViewState.Loading -> {
+                    showProgressBar()
+                    // 로딩 상태 UI 업데이트
+                }
+
+                is ViewState.Success -> {
+                    // 성공 상태 UI 업데이트
+                    hideProgressBar()
+                    mainAdapter.submitList(viewState.data)
+                }
+
+                is ViewState.Error -> {
+                    // 에러 상태 UI 업데이트
+                    hideProgressBar()
+                    showErrorDialog(viewState.message)
+//                    showError(viewState.message)
+                }
             }
         }
         viewModel.itemList.observe(this) {
             mainAdapter.submitList(it)
-        }
-        viewModel.errorMessage.observe(this) {
-            showErrorDialog(it)
         }
     }
 

@@ -9,7 +9,7 @@ class GithubUseCase @Inject constructor(private val githubRepository: GithubRepo
 
     suspend fun getRepositories(q: String) : ViewState<List<Item>> {
         return try {
-            val items = githubRepository.getRepositories(q)
+            var items = githubRepository.getRepositories(q)
             if (items != null) {
                 ViewState.Success(items)
             } else {

@@ -18,32 +18,31 @@ class MainViewModel @Inject constructor(private val githubUseCase: GithubUseCase
 
     private val _itemList = MutableLiveData<List<Item>>()
     val itemList: LiveData<List<Item>> = _itemList
-    val isLoading = MutableLiveData<Boolean>()
-    val errorMessage = MutableLiveData<String>()
+
+    private val _viewState = MutableLiveData<ViewState<List<Item>>>()
+    val viewState: LiveData<ViewState<List<Item>>> = _viewState
+
     init {
         _itemList.value = list
     }
+
     fun requestRepositories() {
         viewModelScope.launch {
-            isLoading.value = true
+            _viewState.value = ViewState.Loading // 로딩 시작
             delay(3000)
             when (val result = githubUseCase.getRepositories("mvvm")) {
                 is ViewState.Success -> {
                     delay(3000)
-                    isLoading.value = false
-                    list = result.data.toMutableList()
-                    _itemList.value = list
-                }
-
-                is ViewState.Loading -> {
-                    isLoading.value = true
+                    _viewState.value = ViewState.Success(result.data) // 성공 상태
+//                    list = result.data.toMutableList()
                 }
 
                 is ViewState.Error -> {
                     delay(3000)
-                    isLoading.value = false
-                    errorMessage.value = result.message
+                    _viewState.value = ViewState.Error(result.message) // 에러 상태
                 }
+
+                else -> {}
             }
         }
     }
